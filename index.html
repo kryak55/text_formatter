@@ -208,15 +208,12 @@
         function updateFormattedText() {
             const inputText = document.getElementById('input-text').value;
             const formattedDiv = document.getElementById('formatted-text');
-            const htmlCodeArea = document.getElementById('html-code');
             
             let processedText = inputText.replace(/<color=([^>]+)>(.*?)<\/color>/g, (match, color, text) => {
                 return <span style="color: ${color};">${text}</span>;
             });
             
             formattedDiv.innerHTML = processedText;
-            
-            htmlCodeArea.value = inputText;
         }
         
         function copyInputText() {
