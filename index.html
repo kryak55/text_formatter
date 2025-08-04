@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Formatter</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #ffffff;
+            color: #000000;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .content {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .format-buttons {
+            margin: 10px 0;
+        }
+        .format-btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .format-btn:hover {
+            background: #005a8b;
+        }
+        .color-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .color-btn:hover {
+            background: #1e7e34;
+        }
+        #color-picker {
+            margin-right: 5px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+        #input-text {
+            width: 90%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            resize: none;
+            overflow-y: auto;
+        }
+        .copy-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            margin-left: 10px;
+            margin-bottom: 1px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .copy-btn:hover {
+            background: #5a6268;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+        }
+        color[color] {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Text formatter</h1>
+        <p>You can input your text below, make it more stylish and then copy it with html tags</p>
+    </header>
+
+    <main>
+        <div class="content">
+            <form id="text-form">
+                <label for="input-text"><b>Input Text:</b></label>
+                <button type="button" class="copy-btn" onclick="copyInputText()">📋 Copy</button><br>
+                <textarea id="input-text" rows="6" cols="50"></textarea><br>
+                
+                <div class="format-buttons">
+                    <button type="button" class="format-btn" onclick="formatSelection('bold')">B</button>
+                    <button type="button" class="format-btn" onclick="formatSelection('italic')">I</button>
+                    <button type="button" class="format-btn" onclick="formatSelection('underline')">U</button>
+                    <input type="color" id="color-picker" value="#ff0000">
+                    <button type="button" class="color-btn" onclick="formatSelectionWithColor()">Color</button>
+                </div>
+                
+                <button type="button" onclick="updateFormattedText()">Update Preview</button>
+            </form>
+
+            <h3 style="margin-bottom: 1px;">Formatted Text:</h3>
+            <div id="formatted-text" style="background: #fff; padding: 10px; border-radius: 5px; min-height: 50px; border: 1px solid #ddd; white-space: pre-wrap;"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 kryak. All rights reserved.</p>
+    </footer>
+
+    <script>
+        if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
+        
+        function formatSelection(type) {
+            const textarea = document.getElementById('input-text');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            if (selectedText === '') {
+                alert('Please select some text first!');
+                return;
+            }
+            
+            let formattedText = '';
+            switch(type) {
+                case 'bold':
+                    formattedText = `<b>${selectedText}</b>`;
+                    break;
+                case 'italic':
+                    formattedText = `<i>${selectedText}</i>`;
+                    break;
+                case 'underline':
+                    formattedText = `<u>${selectedText}</u>`;
+                    break;
+            }
+            
+            const newText = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.value = newText;
+            
+            updateFormattedText();
+            
+            const newCursorPos = start + formattedText.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+            textarea.focus();
+        }
+        
+        function formatSelectionWithColor() {
+            const textarea = document.getElementById('input-text');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            const colorPicker = document.getElementById('color-picker');
+            
+            if (selectedText === '') {
+                alert('Please select some text first!');
+                return;
+            }
+            
+            const formattedText = `<color=${colorPicker.value}>${selectedText}</color>`;
+            
+            const newText = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.value = newText;
+            
+            updateFormattedText();
+            
+            const newCursorPos = start + formattedText.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+            textarea.focus();
+        }
+        
+        function updateFormattedText() {
+            const inputText = document.getElementById('input-text').value;
+            const formattedDiv = document.getElementById('formatted-text');
+            
+            let processedText = inputText.replace(/<color=([^>]+)>(.*?)<\/color>/g, (match, color, text) => {
+                return `<span style="color: ${color};">${text}</span>`;
+            });
+            
+            formattedDiv.innerHTML = processedText;
+        }
+        
+        function copyInputText() {
+            const textarea = document.getElementById('input-text');
+            const text = textarea.value;
+            
+            if (text === '') {
+                alert('Nothing to copy! Please enter some text first.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(function() {
+                const copyBtn = event.target;
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ Copied!';
+                copyBtn.style.background = '#28a745';
+                
+                setTimeout(function() {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '#6c757d';
+                }, 1500);
+            }).catch(function(err) {
+                textarea.select();
+                document.execCommand('copy');
+            });
+        }
+        
+        document.getElementById('input-text').addEventListener('input', updateFormattedText);
+    </script>
+</body>
+</html>
