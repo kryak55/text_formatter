@@ -90,6 +90,7 @@
             border: none;
             padding: 6px 12px;
             margin-left: 10px;
+            margin-bottom: 1px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
@@ -131,7 +132,6 @@
                 
                 <button type="button" onclick="updateFormattedText()">Update Preview</button>
             </form>
-
             <h3 style="margin-bottom: 1px;">Formatted Text:</h3>
             <div id="formatted-text" style="background: #fff; padding: 10px; border-radius: 5px; min-height: 50px; border: 1px solid #ddd; white-space: pre-wrap;"></div>
         </div>
@@ -161,13 +161,13 @@
             let formattedText = '';
             switch(type) {
                 case 'bold':
-                    formattedText = `<b>${selectedText}</b>`;
+                    formattedText = <b>${selectedText}</b>;
                     break;
                 case 'italic':
-                    formattedText = `<i>${selectedText}</i>`;
+                    formattedText = <i>${selectedText}</i>;
                     break;
                 case 'underline':
-                    formattedText = `<u>${selectedText}</u>`;
+                    formattedText = <u>${selectedText}</u>;
                     break;
             }
             
@@ -193,7 +193,7 @@
                 return;
             }
             
-            const formattedText = `<color=${colorPicker.value}>${selectedText}</color>`;
+            const formattedText = <color=${colorPicker.value}>${selectedText}</color>;
             
             const newText = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
             textarea.value = newText;
@@ -211,7 +211,7 @@
             const htmlCodeArea = document.getElementById('html-code');
             
             let processedText = inputText.replace(/<color=([^>]+)>(.*?)<\/color>/g, (match, color, text) => {
-                return `<span style="color: ${color};">${text}</span>`;
+                return <span style="color: ${color};">${text}</span>;
             });
             
             formattedDiv.innerHTML = processedText;
@@ -245,22 +245,6 @@
         }
         
         document.getElementById('input-text').addEventListener('input', updateFormattedText);
-        
-        document.addEventListener('click', function(event) {
-            const textarea = document.getElementById('input-text');
-            if (!textarea.contains(event.target) && event.target !== textarea) {
-                textarea.blur();
-            }
-        });
-        
-        if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
-            document.addEventListener('touchstart', function(event) {
-                const textarea = document.getElementById('input-text');
-                if (!textarea.contains(event.target) && event.target !== textarea) {
-                    textarea.blur();
-                }
-            });
-        }
     </script>
 </body>
 </html>
