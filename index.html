@@ -99,6 +99,29 @@
         .copy-btn:hover {
             background: #5a6268;
         }
+        #size-picker {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+        .size-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .size-btn:hover {
+            background: #c82333;
+        }
         footer {
             text-align: center;
             margin-top: 30px;
@@ -128,6 +151,12 @@
                     <button type="button" class="format-btn" onclick="formatSelection('underline')">U</button>
                     <input type="color" id="color-picker" value="#ff0000">
                     <button type="button" class="color-btn" onclick="formatSelectionWithColor()">Color</button>
+                    <select id="size-picker">
+                        <option value="18">18px</option>
+                        <option value="24">24px</option>
+                        <option value="28">28px</option>
+                    </select>
+                    <button type="button" class="size-btn" onclick="formatSelectionWithSize()">Size</button>
                 </div>
                 
                 <button type="button" onclick="updateFormattedText()">Update Preview</button>
@@ -206,13 +235,41 @@
             textarea.focus();
         }
         
+        function formatSelectionWithSize() {
+            const textarea = document.getElementById('input-text');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            const sizePicker = document.getElementById('size-picker');
+            
+            if (selectedText === '') {
+                alert('Please select some text first!');
+                return;
+            }
+            
+            const formattedText = `<size=${sizePicker.value}>${selectedText}</size>`;
+            
+            const newText = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.value = newText;
+            
+            updateFormattedText();
+            
+            const newCursorPos = start + formattedText.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+            textarea.focus();
+        }
+        
         function updateFormattedText() {
             const inputText = document.getElementById('input-text').value;
             const formattedDiv = document.getElementById('formatted-text');
             
-            let processedText = inputText.replace(/<color=([^>]+)>(.*?)<\/color>/g, (match, color, text) => {
-                return `<span style="color: ${color};">${text}</span>`;
-            });
+            let processedText = inputText
+                .replace(/<color=([^>]+)>(.*?)<\/color>/g, (match, color, text) => {
+                    return `<span style="color: ${color};">${text}</span>`;
+                })
+                .replace(/<size=([^>]+)>(.*?)<\/size>/g, (match, size, text) => {
+                    return `<span style="font-size: ${size}px;">${text}</span>`;
+                });
             
             formattedDiv.innerHTML = processedText;
         }
