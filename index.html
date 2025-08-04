@@ -84,6 +84,20 @@
             resize: none;
             overflow-y: auto;
         }
+        .copy-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .copy-btn:hover {
+            background: #5a6268;
+        }
         footer {
             text-align: center;
             margin-top: 30px;
@@ -103,7 +117,8 @@
     <main>
         <div class="content">
             <form id="text-form">
-                <label for="input-text"><b>Input Text:</b></label><br>
+                <label for="input-text"><b>Input Text:</b></label>
+                <button type="button" class="copy-btn" onclick="copyInputText()">📋 Copy</button><br>
                 <textarea id="input-text" rows="6" cols="50"></textarea><br>
                 
                 <div class="format-buttons">
@@ -119,9 +134,6 @@
 
             <h3 style="margin-bottom: 1px;">Formatted Text:</h3>
             <div id="formatted-text" style="background: #fff; padding: 10px; border-radius: 5px; min-height: 50px; border: 1px solid #ddd; white-space: pre-wrap;"></div>
-            
-            <!-- <h2>HTML Code:</h2>
-            <textarea id="html-code" readonly style="width: 100%; height: 100px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 10px;"></textarea> -->
         </div>
     </main>
 
@@ -130,7 +142,6 @@
     </footer>
 
     <script>
-        // Инициализация Telegram Web App
         if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
@@ -208,7 +219,48 @@
             htmlCodeArea.value = inputText;
         }
         
+        function copyInputText() {
+            const textarea = document.getElementById('input-text');
+            const text = textarea.value;
+            
+            if (text === '') {
+                alert('Nothing to copy! Please enter some text first.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(function() {
+                const copyBtn = event.target;
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ Copied!';
+                copyBtn.style.background = '#28a745';
+                
+                setTimeout(function() {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '#6c757d';
+                }, 1500);
+            }).catch(function(err) {
+                textarea.select();
+                document.execCommand('copy');
+            });
+        }
+        
         document.getElementById('input-text').addEventListener('input', updateFormattedText);
+        
+        document.addEventListener('click', function(event) {
+            const textarea = document.getElementById('input-text');
+            if (!textarea.contains(event.target) && event.target !== textarea) {
+                textarea.blur();
+            }
+        });
+        
+        if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
+            document.addEventListener('touchstart', function(event) {
+                const textarea = document.getElementById('input-text');
+                if (!textarea.contains(event.target) && event.target !== textarea) {
+                    textarea.blur();
+                }
+            });
+        }
     </script>
 </body>
 </html>
