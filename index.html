@@ -174,9 +174,15 @@
     </footer>
 
     <script>
-        if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready()
+            tg.expand()
+            tg.sendData(JSON.stringify({
+                action: "app_opened",
+                user: tg.initDataUnsafe?.user,
+                timestamp: Date.now()
+            }));
         }
         
         function formatSelection(type) {
