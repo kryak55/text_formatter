@@ -178,11 +178,7 @@
             const tg = window.Telegram.WebApp;
             tg.ready();
             tg.expand();
-            tg.sendData(JSON.stringify({
-                action: 'app_opened',
-                user: tg.initDataUnsafe?.user,
-                timestamp: Date.now()
-            }));
+            tg.sendData("Opened app.");
         }
         
         function formatSelection(type) {
